@@ -19,7 +19,12 @@ fun play(game: Game) {
 //}
 
 fun render(field: Field) {
-    println(field)
+    repeat(field.size) { row ->
+        repeat(field.size) { col ->
+            print("[ ${field.get(row, col)} ] ")
+        }
+        println()
+    }
 
 }
 
@@ -35,7 +40,7 @@ interface Field {
     fun get(row: Int, col: Int): Boolean?
 }
 
-class GameImpl: Game {
+class GameImpl : Game {
     override val isFinished: Boolean = false
     override val field: Field = ArrayField(3)
 
