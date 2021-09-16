@@ -1,26 +1,54 @@
 package XO
 
 fun main() {
-    println("Welcome to TicTacToe game")
+    play(GameImpl())
 }
 
 fun play(game: Game) {
-    //render
-    //get input
-    //act
+    while (!game.isFinished) {
+        render(game.field)
+        println("Your turn: ")
+        val input = readLine() ?: error("Can't read line")
+        val points = input.split(" ").map { it.toInt() }  //TODO: validate
+        game.act(points[0], points[1])
+    }
+}
+//
+//fun render(field: Array<Array<Boolean?>>) {
+//
+//}
+
+fun render(field: Field) {
+    println(field)
 
 }
 
-fun render(field: Array<Array<Boolean?>>) {
-
-}
 
 interface Game {
-    val field: Array<Array<Boolean?>>
+    val isFinished: Boolean
+    val field: Field
     fun act(row: Int, col: Int)
 }
 
 interface Field {
     val size: Int
     fun get(row: Int, col: Int): Boolean?
+}
+
+class GameImpl: Game {
+    override val isFinished: Boolean = false
+    override val field: Field = ArrayField(3)
+
+    override fun act(row: Int, col: Int) {
+
+    }
+
+}
+
+
+class ArrayField(override val size: Int) : Field {
+
+    private val points: Array<Array<Boolean?>> = Array(size) { arrayOfNulls(size) }
+
+    override fun get(row: Int, col: Int): Boolean? = points[row][col]
 }
