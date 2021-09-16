@@ -90,6 +90,21 @@ class GameImpl : Game {
             }
         }
         isFinished = true
+
+        //TODO winners?
+
+        val winnerCombination = mutableListOf<Sequence<Pair<Int, Int>>>().apply {
+            val r = field.size
+            add(
+                sequence { repeat(r) { yield(it to it) } }
+            )
+            add(
+                sequence { repeat(r) { yield(it to r - 1 - it) } }
+            )
+
+
+        }
+
     }
 
     private fun actAi() {
@@ -119,3 +134,4 @@ class GameImpl : Game {
 
         override fun get(row: Int, col: Int): Boolean? = points[row][col]
     }
+}
