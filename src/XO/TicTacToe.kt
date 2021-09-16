@@ -1,0 +1,123 @@
+package XO
+
+import kotlin.random.Random
+
+fun main() {
+    play(GameImpl())
+}
+
+fun play(game: Game) {
+    while (!game.isFinished) {
+        render(game.field)
+        println("Your turn: ")
+        do {
+            val (row, col) = input()
+        } while (!game.act(row, col))
+    }
+
+
+    val winnerText = game.winner?.let { "The winner is ${it.toMark()}" } ?: "Tie"
+    println(winnerText)
+
+    //TODO winner?
+}
+
+fun input(): Pair<Int, Int> {
+    val input = readLine() ?: error("Can't read line")
+    val points = input.split(" ").map { it.toInt() }  //TODO: validate
+    return points[0] to points[1]
+}
+
+fun render(field: Field) {
+    repeat(field.size) { row ->
+        repeat(field.size) { col ->
+            print("[ ${field.get(row, col).toMark()} ] ")
+        }
+        println()
+    }
+}
+
+fun Boolean?.toMark(): String = when (this) {
+    true -> "X"
+    false -> "O"
+    null -> "-"
+}
+
+interface Game {
+    val isFinished: Boolean
+    val winner: Boolean?
+    val field: Field
+    fun act(row: Int, col: Int): Boolean
+}
+
+interface Field {
+    val size: Int
+    fun get(row: Int, col: Int): Boolean?
+}
+
+interface MutableField : Field {
+    fun set(row: Int, col: Int, value: Boolean)
+}
+
+class GameImpl : Game {
+    override var isFinished: Boolean = false
+    override val winner: Boolean? = null
+    override val field: MutableField = ArrayField(3)
+
+    private val userMark = Random.nextBoolean()
+
+    init {
+        if (!userMark) {
+            actAi()
+        }
+    }
+
+    override fun act(row: Int, col: Int): Boolean {
+        if (field.get(row, col) != null) {
+            return false
+        }
+        field.set(row, col, userMark)
+        checkEnd()
+        if (!isFinished) {
+            actAi()
+            checkEnd()
+        }
+        return true
+    }
+
+    private fun checkEnd() {
+        repeat(field.size) { row ->
+            repeat(field.size) { col ->
+                if (field.get(row,col) == null){
+                    return
+                }
+            }
+        }
+        isFinished = true
+    }
+
+    private fun actAi() {
+        repeat(field.size) { row ->
+            repeat(field.size) { col ->
+                if (field.get(row, col) == null) {
+                    field.set(row, col, !userMark)
+                    return
+                }
+            }
+        }
+        field.set(Random.nextInt(field.size), Random.nextInt(field.size), !userMark)
+    }
+
+}
+
+
+class ArrayField(override val size: Int) : MutableField {
+
+    private val points: Array<Array<Boolean?>> = Array(size) { arrayOfNulls(size) }
+
+    override fun set(row: Int, col: Int, value: Boolean) {
+        points[row][col] = value
+    }
+
+    override fun get(row: Int, col: Int): Boolean? = points[row][col]
+}
