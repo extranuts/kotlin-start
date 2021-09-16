@@ -10,6 +10,11 @@ fun main() {
 
     println(testDefArgs(1, 2))
 
+    printEven(1, 2, 3, 4, 5, 6, 7, 8)
+
+    printEven(*intArrayOf(1, 2, 3, 4, 5), 6, 7, 8, 9, 10)
+
+
 }
 
 fun testSimple(): Int {
@@ -30,4 +35,12 @@ fun testNamedArgs(x: Int, y: Int, z: Int): List<Int> {
 
 fun testDefArgs(x: Int = 1, y: Int = 2) {
     println(x + y)
+}
+
+fun foo(name: String, number: Int = 42, toUpperCase: Boolean = false) {
+    (if (toUpperCase) name.toUpperCase() else name) + number
+}
+
+fun printEven(vararg number: Int) {
+    number.forEach { e -> if (e % 2 == 0) println(e) }
 }
