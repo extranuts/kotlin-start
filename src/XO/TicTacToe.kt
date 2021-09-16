@@ -14,8 +14,6 @@ fun play(game: Game) {
             val (row, col) = input()
         } while (!game.act(row, col))
     }
-
-
     val winnerText = game.winner?.let { "The winner is ${it.toMark()}" } ?: "Tie"
     println(winnerText)
 
@@ -86,38 +84,38 @@ class GameImpl : Game {
     }
 
     private fun checkEnd() {
-        repeat(field.size) { row ->
-            repeat(field.size) { col ->
-                if (field.get(row,col) == null){
-                    return
-                }
+        field.forEach { _, _, value ->
+            if (value == null) {
+                return
             }
         }
         isFinished = true
     }
 
     private fun actAi() {
-        repeat(field.size) { row ->
-            repeat(field.size) { col ->
-                if (field.get(row, col) == null) {
-                    field.set(row, col, !userMark)
-                    return
-                }
+        field.forEach { row, col, value ->
+            if (value == null) {
+                field.set(row, col, !userMark)
+                return
             }
         }
-        field.set(Random.nextInt(field.size), Random.nextInt(field.size), !userMark)
     }
 
-}
-
-
-class ArrayField(override val size: Int) : MutableField {
-
-    private val points: Array<Array<Boolean?>> = Array(size) { arrayOfNulls(size) }
-
-    override fun set(row: Int, col: Int, value: Boolean) {
-        points[row][col] = value
+    inline fun Field.forEach(action: (row: Int, col: Int, value: Boolean?) -> Unit) {
+        repeat(size) { row ->
+            repeat(size) { col ->
+                action(row, col, get(row, col))
+            }
+        }
     }
 
-    override fun get(row: Int, col: Int): Boolean? = points[row][col]
-}
+    class ArrayField(override val size: Int) : MutableField {
+
+        private val points: Array<Array<Boolean?>> = Array(size) { arrayOfNulls(size) }
+
+        override fun set(row: Int, col: Int, value: Boolean) {
+            points[row][col] = value
+        }
+
+        override fun get(row: Int, col: Int): Boolean? = points[row][col]
+    }
